@@ -1,39 +1,23 @@
-Yeah, I believe you that you preloaded the model — but the stack trace is showing **Ray workers on the other nodes** still trying to download shards from Hugging Face:
+# MiniMax-M2 on 8× NVIDIA GB10 (8 Spark Nodes) with vLLM + Ray
 
-* The failing process is on `ip=10.10.0.2` / `10.10.0.3` / `10.10.0.4`
-* Inside *their* containers, `/root/.cache/huggingface` is **not** the same as the cache you warmed on the head (unless you explicitly mounted it there too).
-* So from their POV, the model isn’t cached, and they hit HF → CAS/xet → boom.
-
-Preloading only “counts” where vLLM is actually running, and inside Docker that means:
-
-* Either you mount the cache into **every** container on **every** node
-* Or you mount a **fully downloaded local copy** of the repo and point vLLM at that.
-
----
-
-Below is what you asked for: a **single self-contained markdown doc** that captures the steps that *worked* for the Ray cluster + vLLM + MiniMax-M2 setup, with the fixes to avoid HF download issues.
-
-You can save this as e.g. `spark-minimax-m2-ray-vllm-4node.md`.
-
----
-
-````markdown
-# MiniMax-M2 on 4× NVIDIA GB10 (4 Spark Nodes) with vLLM + Ray
-
-This document describes how to run **MiniMaxAI/MiniMax-M2** on a **4-node Spark cluster** with **1 GPU per node** using **vLLM 0.12.0** and **Ray**.
+This document describes how to run **MiniMaxAI/MiniMax-M2** on an **8-node Spark cluster** with **1 GPU per node** using **vLLM 0.12.0** and **Ray**.
 
 It assumes:
 
 - Nodes:
-  - `spark-50e0` (head) – IPs:  
-    - WAN (RJ45): `192.168.1.120`  
-    - 100GbE (switch): `10.10.0.1`  
+  - `spark-50e0` (head) – IPs:
+    - WAN (RJ45): `192.168.1.120`
+    - 100GbE (switch): `10.10.0.1`
   - `spark-683e` – `192.168.1.121`, `10.10.0.2`
-  - `spark-XXXX` – `192.168.1.122`, `10.10.0.3`
-  - `spark-YYYY` – `192.168.1.123`, `10.10.0.4`
+  - Worker 3 – `192.168.1.122`, `10.10.0.3`
+  - Worker 4 – `192.168.1.123`, `10.10.0.4`
+  - Worker 5 – `192.168.1.124`, `10.10.0.5`
+  - Worker 6 – `192.168.1.125`, `10.10.0.6`
+  - Worker 7 – `192.168.1.126`, `10.10.0.7`
+  - Worker 8 – `192.168.1.127`, `10.10.0.8`
 - Each node has **one NVIDIA GB10 GPU**.
 - 100GbE interface is `enp1s0f1np1` (adjust if your interface name differs).
-- You want to expose the OpenAI-compatible endpoint on  
+- You want to expose the OpenAI-compatible endpoint on
   `http://192.168.1.120:8000/v1`.
 
 ---
@@ -44,7 +28,7 @@ You must make sure that **each node** has access to the MiniMax-M2 weights in a 
 
 ### Option A – Use Hugging Face cache (simple)
 
-On **each node (120–123, on host)**:
+On **each node (120–127, on host)**:
 
 ```bash
 pip install "huggingface_hub>=0.25"
@@ -58,7 +42,7 @@ snapshot_download(
     local_dir_use_symlinks=False,
 )
 PY
-````
+```
 
 Then ensure your containers mount this cache path into `/root/.cache/huggingface`.
 
@@ -93,25 +77,19 @@ Then mount `/models/MiniMax-M2` into the containers and point vLLM at `/models/M
 On **all nodes**, as `mars` (or root as appropriate):
 
 ```bash
-docker rm -f vllm-head vllm-worker-121 vllm-worker-122 vllm-worker-123 2>/dev/null || true
+docker rm -f vllm-head vllm-worker-121 vllm-worker-122 vllm-worker-123 \
+             vllm-worker-124 vllm-worker-125 vllm-worker-126 vllm-worker-127 2>/dev/null || true
 ```
 
 ---
 
 ## 2. Start Ray Head on spark-50e0 (Node 120)
 
-On `spark-50e0` (head), choose:
+On `spark-50e0` (head):
 
 ```bash
-HEAD_100G_IP=10.10.0.1          # 100GbE
-IFACE_100G=enp1s0f1np1          # 100GbE interface name
-```
-
-Start the head container:
-
-```bash
-HEAD_100G_IP=10.10.0.1          # 100GbE
-IFACE_100G=enp1s0f1np1          # 100GbE interface name
+HEAD_100G_IP=10.10.0.1
+IFACE_100G=enp1s0f1np1
 
 docker run -d --gpus all --ipc=host --network host \
   -e MASTER_ADDR=$HEAD_100G_IP \
@@ -136,14 +114,12 @@ You should see **1 active node** with **1 GPU** and no failures.
 
 ---
 
-## 3. Start Ray Workers on the Other Nodes
+## 3. Start Ray Workers on the Other 7 Nodes
 
-Repeat on each worker node with its own `10.10.0.x` address.
-
-## On Worker Nodes
+Run the following on each worker node, substituting the node's own `10.10.0.x` address.
 
 ```bash
-HEAD_100G_IP=10.0.0.1
+HEAD_100G_IP=10.10.0.1
 IFACE_100G=enp1s0f1np1
 
 docker run -d --gpus all --ipc=host --network host \
@@ -158,18 +134,17 @@ docker run -d --gpus all --ipc=host --network host \
   vllm/vllm-openai:latest \
   -lc "ray start --address=$HEAD_100G_IP:6379 --block"
 ```
-docker stop spark-a61c 2>/dev/null || true \
-docker rm spark-a61c
-Now check from the head again:
+
+Check from the head once all workers are up:
 
 ```bash
-docker exec -it vllm-head ray status
+docker exec -it spark ray status
 ```
 
 You want:
 
-* **4 active nodes**
-* **4 GPUs total**
+* **8 active nodes**
+* **8 GPUs total**
 * no pending nodes / failures
 
 ---
@@ -179,7 +154,7 @@ You want:
 Enter the head container:
 
 ```bash
-docker exec -it vllm-head bash
+docker exec -it spark bash
 cd /vllm-workspace
 ```
 
@@ -189,16 +164,10 @@ Set environment:
 export SAFETENSORS_FAST_GPU=1
 export VLLM_HOST_IP=10.10.0.1   # 100GbE IP of head
 
-# Optional but recommended to avoid CAS/xet download issues
+# Avoid CAS/xet download issues
 export HF_HUB_ENABLE_XET=0
 export HF_HUB_DOWNLOAD_TIMEOUT=600
 export HF_HUB_DOWNLOAD_RETRY=10
-```
-
-Choose tensor parallel size:
-
-```bash
-TP=4    # 4 GPUs total (1 per node)
 ```
 
 ### If using HF cache
@@ -213,15 +182,13 @@ export HF_HUB_DOWNLOAD_RETRY=10
 vllm serve MiniMaxAI/MiniMax-M2 \
   --trust-remote-code \
   --distributed-executor-backend ray \
-  --tensor-parallel-size "$TP" \
+  --tensor-parallel-size 8 \
   --enable-auto-tool-choice --tool-call-parser minimax_m2 \
   --reasoning-parser minimax_m2_append_think \
   --host 0.0.0.0 --port 8000
 ```
 
 ### If using local model directory
-
-If you mounted `/models/MiniMax-M2` on all nodes:
 
 ```bash
 export SAFETENSORS_FAST_GPU=1
@@ -233,7 +200,7 @@ export HF_HUB_DOWNLOAD_RETRY=10
 vllm serve /vllm-workspace/models/MiniMaxAI/MiniMax-M2 \
   --trust-remote-code \
   --distributed-executor-backend ray \
-  --tensor-parallel-size 4 \
+  --tensor-parallel-size 8 \
   --enable-auto-tool-choice --tool-call-parser minimax_m2 \
   --reasoning-parser minimax_m2_append_think \
   --host 0.0.0.0 --port 8000
@@ -242,7 +209,7 @@ vllm serve /vllm-workspace/models/MiniMaxAI/MiniMax-M2 \
 You should see in the logs:
 
 * Model resolved as `MiniMaxM2ForCausalLM`
-* TP world size 4, ranks spread across `10.10.0.1–10.10.0.4`
+* TP world size 8, ranks spread across `10.10.0.1–10.10.0.8`
 * No fatal `RuntimeError: Data processing error: CAS service error ...`
 
 ---
@@ -251,31 +218,22 @@ You should see in the logs:
 
 ### Inside the head node (spark-50e0)
 
-From the host:
-
 ```bash
 ss -tulpn | grep 8000
 curl -v http://127.0.0.1:8000/v1/models
 ```
 
-You should get a JSON list of models including `"MiniMaxAI/MiniMax-M2"` (or the path you served).
+You should get a JSON list of models including `"MiniMaxAI/MiniMax-M2"`.
 
-### From your Mac (192.168.1.125 → 192.168.1.120)
+### From your Mac
 
 ```bash
 curl -v http://192.168.1.120:8000/v1/models
 ```
 
-This checks that:
-
-* RJ45 interface `192.168.1.120` is reachable
-* Docker is listening on `0.0.0.0:8000` on the host
-
 ---
 
 ## 6. Test via OpenAI Python Client
-
-In your `openai` environment on the Mac:
 
 ```python
 from openai import OpenAI
@@ -293,38 +251,19 @@ resp = client.chat.completions.create(
 print(resp.choices[0].message.content)
 ```
 
-If everything is wired correctly, you should see a normal chat response.
-
 ---
 
 ## 7. Notes and Gotchas
 
-* **“But I preloaded the models!”**
-  Preloading on the **host** only helps if the containers can see the **same path**. That’s why we mount `/home/mars/.cache/huggingface` into `/root/.cache/huggingface` on **every** Ray node, not just the head.
+* **Model preloading must happen on every node.**
+  Preloading on the **host** only helps if the containers see the **same path**. Mount `/home/mars/.cache/huggingface` into `/root/.cache/huggingface` on **every** Ray node.
 
 * **CAS / Xet / Reqwest errors from HF**
-  These usually come from `huggingface_hub`’s xet backend. Setting:
-
-  ```bash
-  export HF_HUB_ENABLE_XET=0
-  ```
-
-  forces a simpler HTTP download path and avoids that specific error.
+  Setting `HF_HUB_ENABLE_XET=0` forces a simpler HTTP download path and avoids this.
 
 * **Ray + vLLM warnings about TP > GPUs per node**
-  With 1 GPU per node and TP=4, vLLM will warn that tensor parallel spans multiple nodes. That’s expected in this setup; performance is still fine with good interconnect (your 100GbE).
+  With 1 GPU per node and TP=8, vLLM will warn that tensor parallel spans multiple nodes. That's expected; performance is fine with 100GbE interconnect.
 
 * **Ports and addresses**
-
   * Ray head: `10.10.0.1:6379`
   * vLLM API: `0.0.0.0:8000` on the head → exposed as `192.168.1.120:8000` for LAN clients.
-
----
-
-End of document.
-
-```
-
-If you want, I can trim this down into a shorter “ops runbook” version, but this one captures all the pieces that actually matter for your current setup, including why the HF errors happened even though you’d already pulled the model.
-::contentReference[oaicite:0]{index=0}
-```
