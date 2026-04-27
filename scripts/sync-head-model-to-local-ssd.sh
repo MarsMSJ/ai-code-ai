@@ -8,6 +8,13 @@ MODELS_ROOT="${MODELS_ROOT:-/home/mars/models}"
 SOURCE="$HEAD_SSH:$MODELS_ROOT/$MODEL_RELATIVE_PATH/"
 DEST="$MODELS_ROOT/$MODEL_RELATIVE_PATH/"
 
+if mountpoint -q "$MODELS_ROOT"; then
+  echo "ERROR: $MODELS_ROOT is a mounted filesystem, not the worker's local SSD path."
+  echo "Unmount it first if you want vLLM to load from local SSD:"
+  echo "  sudo umount $MODELS_ROOT"
+  exit 1
+fi
+
 sudo mkdir -p "$DEST"
 sudo chown -R "$(id -u):$(id -g)" "$MODELS_ROOT"
 
