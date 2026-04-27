@@ -18,6 +18,7 @@ vllm serve "$MODEL_PATH" \
     --trust-remote-code \
     --distributed-executor-backend ray \
     --tensor-parallel-size 4 \
+    --gpu-memory-utilization 0.90 \
     --enable-auto-tool-choice --tool-call-parser minimax_m2 \
     --reasoning-parser minimax_m2_append_think \
     --host 0.0.0.0 --port "$VLLM_PORT"
