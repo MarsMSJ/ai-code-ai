@@ -8,6 +8,10 @@ HEAD_100G_IP="10.100.0.10"
 MODEL_PATH="${MODEL_PATH:-/mnt/expac/models/MiniMaxAI/MiniMax-M2}"
 VLLM_PORT=8000
 
+CUDA13_LIB="/home/mars/.venv-tq/lib/python3.12/site-packages/nvidia/cu13/lib"
+ln -sf "$CUDA13_LIB/libcudart.so.13" "$CUDA13_LIB/libcudart.so.12" 2>/dev/null || true
+export LD_LIBRARY_PATH="$CUDA13_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
 export VLLM_HOST_IP="$HEAD_100G_IP"
 export SAFETENSORS_FAST_GPU=1
 export HF_HUB_ENABLE_XET=0

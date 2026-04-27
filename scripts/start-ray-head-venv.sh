@@ -13,6 +13,10 @@ sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 ray stop --force 2>/dev/null || true
 sleep 2
 
+CUDA13_LIB="/home/mars/.venv-tq/lib/python3.12/site-packages/nvidia/cu13/lib"
+ln -sf "$CUDA13_LIB/libcudart.so.13" "$CUDA13_LIB/libcudart.so.12" 2>/dev/null || true
+export LD_LIBRARY_PATH="$CUDA13_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
 export GLOO_SOCKET_IFNAME="$IFACE_100G"
 export NCCL_SOCKET_IFNAME="$IFACE_100G"
 export UCX_NET_DEVICES="$IFACE_100G"
