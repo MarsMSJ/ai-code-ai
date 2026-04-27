@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Run on HEAD node: spark-50e0 (192.168.1.120 / 10.10.0.1)
+# Run on HEAD node: spark-50e0 (192.168.1.120 / 10.10.0.10)
 # Starts the Ray head container for MiniMax-M2 inference.
 
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 HEAD_WAN_IP="192.168.1.120"
-HEAD_100G_IP="10.10.0.1"
+HEAD_100G_IP="10.10.0.10"
 IFACE_100G="enp1s0f1np1"
 VLLM_IMAGE="${VLLM_IMAGE:-vllm/vllm-openai:latest}"
 HF_CACHE="${HF_CACHE:-/home/mars/.cache/huggingface}"

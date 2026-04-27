@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_100G_IP="10.10.0.1"
+HEAD_100G_IP="10.10.0.10"
 VENV_PATH="${VENV_PATH:-/home/mars/.venv-tq}"
 MODEL_ID="MiniMaxAI/MiniMax-M2"
 LOCAL_MODEL_PATH="${LOCAL_MODEL_PATH:-/mnt/expac/models/MiniMaxAI/MiniMax-M2}"
@@ -52,7 +52,7 @@ echo ""
 "$VLLM" serve "$SERVE_TARGET" \
     --trust-remote-code \
     --distributed-executor-backend ray \
-    --tensor-parallel-size 8 \
+    --tensor-parallel-size 4 \
     --enable-auto-tool-choice --tool-call-parser minimax_m2 \
     --reasoning-parser minimax_m2_append_think \
     --host 0.0.0.0 --port "$VLLM_PORT"

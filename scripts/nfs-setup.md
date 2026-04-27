@@ -6,14 +6,10 @@ Shares the 4TB drive from the head node (`spark-50e0`) to all worker nodes over 
 
 | Role        | WAN IP          | 100GbE IP    |
 |-------------|-----------------|--------------|
-| Head        | 192.168.1.120   | 10.10.0.1    |
-| Worker 1    | 192.168.1.121   | 10.10.0.2    |
-| Worker 2    | 192.168.1.122   | 10.10.0.3    |
-| Worker 3    | 192.168.1.123   | 10.10.0.4    |
-| Worker 4    | 192.168.1.124   | 10.10.0.5    |
-| Worker 5    | 192.168.1.125   | 10.10.0.6    |
-| Worker 6    | 192.168.1.126   | 10.10.0.7    |
-| Worker 7    | 192.168.1.127   | 10.10.0.8    |
+| Head        | 192.168.1.120   | 10.10.0.10   |
+| Worker 1    | 192.168.1.121   | 10.10.0.11   |
+| Worker 2    | 192.168.1.122   | 10.10.0.12   |
+| Worker 3    | 192.168.1.123   | 10.10.0.13   |
 
 Mount point: `/mnt/expac` on all nodes.
 
@@ -52,7 +48,7 @@ showmount -e localhost
 
 Expected output:
 ```
-/mnt/expac  10.10.0.0/24
+/mnt/expac  192.168.1.0/24
 ```
 
 ---
@@ -75,7 +71,7 @@ ls /mnt/expac
 ### Mount all workers at once from the head (SSH shortcut)
 
 ```bash
-for IP in 10.10.0.{2..8}; do
+for IP in 192.168.1.{121..123}; do
     echo "==> $IP"
     ssh mars@$IP "sudo bash -s" < scripts/mount-nfs-client.sh
 done

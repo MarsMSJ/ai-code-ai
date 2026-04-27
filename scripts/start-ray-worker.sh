@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_100G_IP="10.10.0.1"
+HEAD_100G_IP="10.10.0.10"
 IFACE_100G="enp1s0f1np1"
 VLLM_IMAGE="${VLLM_IMAGE:-vllm/vllm-openai:latest}"
 HF_CACHE="${HF_CACHE:-/home/mars/.cache/huggingface}"

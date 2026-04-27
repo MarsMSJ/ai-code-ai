@@ -40,7 +40,7 @@ sudo bash scripts/start-ray-worker.sh
 Or from the head in one shot:
 
 ```bash
-for IP in 192.168.1.{121..127}; do
+for IP in 192.168.1.{121..123}; do
     echo "==> Starting worker on $IP"
     ssh mars@$IP "sudo VLLM_IMAGE=vllm/vllm-openai:latest bash -s" \
         < scripts/start-ray-worker.sh &
@@ -64,7 +64,7 @@ bash scripts/start-vllm.sh
 ### Teardown
 
 ```bash
-for IP in 192.168.1.{120..127}; do
+for IP in 192.168.1.{120..123}; do
     ssh mars@$IP "docker rm -f spark" &
 done
 wait
@@ -106,7 +106,7 @@ sudo bash scripts/start-ray-worker-venv.sh
 Or from the head in one shot:
 
 ```bash
-for IP in 192.168.1.{121..127}; do
+for IP in 192.168.1.{121..123}; do
     echo "==> $IP"
     ssh mars@$IP "sudo bash -s" < scripts/start-ray-worker-venv.sh &
 done
@@ -121,8 +121,8 @@ echo "All workers joined."
 ```
 
 You want:
-- **8 active nodes**
-- **8 GPUs total**
+- **4 active nodes**
+- **4 GPUs total**
 - 0 pending / 0 failed
 
 ### 4. Start vLLM server (from head)
@@ -134,7 +134,7 @@ bash scripts/start-vllm-venv.sh
 ### Teardown
 
 ```bash
-for IP in 192.168.1.{120..127}; do
+for IP in 192.168.1.{120..123}; do
     ssh mars@$IP "/home/mars/.venv-tq/bin/ray stop --force" &
 done
 wait

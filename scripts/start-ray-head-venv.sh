@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Run on HEAD node: spark-50e0 (192.168.1.120 / 10.10.0.1)
+# Run on HEAD node: spark-50e0 (192.168.1.120 / 10.10.0.10)
 # Starts Ray head using the vLLM venv (no Docker).
 
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_100G_IP="10.10.0.1"
+HEAD_100G_IP="10.10.0.10"
 IFACE_100G="enp1s0f1np1"
 VENV_PATH="${VENV_PATH:-/home/mars/.venv-tq}"   # override if venv is on NFS: VENV_PATH=/mnt/expac/venv-tq
 RAY_PORT=6379

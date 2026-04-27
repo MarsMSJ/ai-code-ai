@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_100G_IP="10.10.0.1"
+HEAD_100G_IP="10.10.0.10"
 IFACE_100G="enp1s0f1np1"
 VENV_PATH="${VENV_PATH:-/home/mars/.venv-tq}"   # or /mnt/expac/venv-tq if on NFS
 RAY_PORT=6379
