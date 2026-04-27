@@ -8,11 +8,6 @@ HEAD_100G_IP="10.100.0.10"
 MODEL_PATH="${MODEL_PATH:-/mnt/expac/models/MiniMaxAI/MiniMax-M2}"
 VLLM_PORT=8000
 
-CUDA_LIB="/usr/local/cuda-13.0/targets/sbsa-linux/lib"
-mkdir -p /tmp/cuda-compat
-ln -sf "$CUDA_LIB/libcudart.so.13" /tmp/cuda-compat/libcudart.so.12
-export LD_LIBRARY_PATH="/tmp/cuda-compat:$CUDA_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-
 export VLLM_HOST_IP="$HEAD_100G_IP"
 export SAFETENSORS_FAST_GPU=1
 export HF_HUB_ENABLE_XET=0
