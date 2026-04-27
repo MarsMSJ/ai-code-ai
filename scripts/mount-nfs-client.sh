@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_NFS_IP="${HEAD_NFS_IP:-192.168.1.120}"
+HEAD_NFS_IP="${HEAD_NFS_IP:-10.10.0.10}"
 NFS_EXPORT="${NFS_EXPORT:-/mnt/expac}"
 LOCAL_MOUNT="${LOCAL_MOUNT:-/mnt/expac}"
 NFS_MOUNT_OPTS="nfs  defaults,_netdev,nofail,rsize=1048576,wsize=1048576,hard,intr  0  0"

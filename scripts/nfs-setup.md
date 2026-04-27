@@ -48,7 +48,7 @@ showmount -e localhost
 
 Expected output:
 ```
-/mnt/expac  192.168.1.0/24
+/mnt/expac  10.10.0.0/24
 ```
 
 ---
