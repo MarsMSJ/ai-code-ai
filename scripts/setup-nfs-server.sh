@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Run on HEAD node (spark-50e0, 192.168.1.120 / 10.10.0.1)
-# Mounts the 4TB mars-expac drive and exports it via NFS to all worker nodes.
+# Mounts the 4TB mars-expac drive by label and exports it via NFS to all worker nodes.
 
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-NFS_DEVICE="${NFS_DEVICE:-/dev/sdb}"   # override: NFS_DEVICE=/dev/nvme1n1 ./setup-nfs-server.sh
+DRIVE_LABEL="mars-expac"
 NFS_MOUNT="${NFS_MOUNT:-/mnt/expac}"
 NFS_SUBNET="10.10.0.0/24"             # 100GbE network only
 NFS_OPTS="rw,sync,no_subtree_check,no_root_squash"
@@ -15,12 +15,15 @@ echo "==> Installing NFS server..."
 apt-get update -q
 apt-get install -y -q nfs-kernel-server
 
-echo "==> Checking device $NFS_DEVICE..."
-if ! lsblk "$NFS_DEVICE" &>/dev/null; then
-    echo "ERROR: device $NFS_DEVICE not found. Set NFS_DEVICE= to the correct block device."
-    lsblk
+echo "==> Looking up device for label '$DRIVE_LABEL'..."
+NFS_DEVICE=$(blkid -L "$DRIVE_LABEL" 2>/dev/null || true)
+if [[ -z "$NFS_DEVICE" ]]; then
+    echo "ERROR: No device found with label '$DRIVE_LABEL'."
+    echo "  Check available drives and labels:"
+    lsblk -o NAME,SIZE,LABEL,TYPE,MOUNTPOINT
     exit 1
 fi
+echo "    Found: $NFS_DEVICE"
 
 echo "==> Creating mount point $NFS_MOUNT..."
 mkdir -p "$NFS_MOUNT"
@@ -32,10 +35,9 @@ else
     echo "    $NFS_MOUNT already mounted, skipping."
 fi
 
-if ! grep -qs "$NFS_DEVICE" /etc/fstab; then
-    echo "==> Adding $NFS_DEVICE to /etc/fstab..."
-    UUID=$(blkid -s UUID -o value "$NFS_DEVICE")
-    echo "UUID=$UUID  $NFS_MOUNT  auto  defaults,nofail  0  2" >> /etc/fstab
+if ! grep -qs "LABEL=$DRIVE_LABEL" /etc/fstab; then
+    echo "==> Adding drive to /etc/fstab (by label)..."
+    echo "LABEL=$DRIVE_LABEL  $NFS_MOUNT  auto  defaults,nofail  0  2" >> /etc/fstab
 fi
 
 echo "==> Configuring NFS export..."
