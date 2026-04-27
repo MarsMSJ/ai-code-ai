@@ -9,6 +9,7 @@ IFACE_100G="enp1s0f1np1"
 RAY_PORT=6379
 
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
+sudo mount -o remount,size=120G /dev/shm
 
 ray stop --force 2>/dev/null || true
 sleep 2
