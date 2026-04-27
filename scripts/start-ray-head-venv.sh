@@ -9,7 +9,6 @@ IFACE_100G="enp1s0f1np1"
 RAY_PORT=6379
 
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-sudo mount -o remount,size=120G /dev/shm
 
 ray stop --force 2>/dev/null || true
 sleep 2
@@ -26,6 +25,6 @@ ray start \
     --object-manager-port=8076 \
     --node-manager-port=8077 \
     --ray-client-server-port=10001 \
-    --object-store-memory=20000000000
+    --object-store-memory=10000000000
 
 ray status

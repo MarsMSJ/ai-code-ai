@@ -12,7 +12,6 @@ WORKER_100G_IP=$(ip -4 addr show "$IFACE_100G" | grep -oP '(?<=inet\s)\d+(\.\d+)
 echo "Worker IP: $WORKER_100G_IP"
 
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
-sudo mount -o remount,size=120G /dev/shm
 
 ray stop --force 2>/dev/null || true
 sleep 2
@@ -26,4 +25,4 @@ ray start \
     --node-ip-address="$WORKER_100G_IP" \
     --object-manager-port=8076 \
     --node-manager-port=8077 \
-    --object-store-memory=20000000000
+    --object-store-memory=10000000000
