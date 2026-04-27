@@ -6,7 +6,7 @@ set -euo pipefail
 HEAD_WAN_IP="192.168.1.120"
 HEAD_100G_IP="10.100.0.10"
 IFACE_100G="enp1s0f1np1"
-VLLM_IMAGE="${VLLM_IMAGE:-vllm/vllm-openai:26.03.post1-py3}"
+VLLM_IMAGE="${VLLM_IMAGE:-nvcr.io/nvidia/vllm:26.03.post1-py3}"
 HF_CACHE="${HF_CACHE:-/home/mars/.cache/huggingface}"
 
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'

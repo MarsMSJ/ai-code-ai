@@ -5,7 +5,7 @@ set -euo pipefail
 
 HEAD_100G_IP="10.100.0.10"
 IFACE_100G="enp1s0f1np1"
-VLLM_IMAGE="${VLLM_IMAGE:-vllm/vllm-openai:26.03.post1-py3}"
+VLLM_IMAGE="${VLLM_IMAGE:-nvcr.io/nvidia/vllm:26.03.post1-py3}"
 HF_CACHE="${HF_CACHE:-/home/mars/.cache/huggingface}"
 
 WORKER_100G_IP=$(ip -4 addr show "$IFACE_100G" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
