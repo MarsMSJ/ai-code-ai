@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
-# Run on HEAD node: spark-50e0 (192.168.1.120)
-
-set -euo pipefail
+# Run on HEAD node: spark-50e0 (10.100.0.10)
 
 VLLM_IMAGE="nvcr.io/nvidia/vllm:26.03.post1-py3"
 MN_IF_NAME="enp1s0f1np1"
-HEAD_IP="192.168.1.120"
+VLLM_HOST_IP="10.100.0.10"
 
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
 
-bash ~/run_cluster.sh "$VLLM_IMAGE" "$HEAD_IP" --head ~/.cache/huggingface \
-  -e VLLM_HOST_IP="$HEAD_IP" \
-  -e UCX_NET_DEVICES="$MN_IF_NAME" \
-  -e NCCL_SOCKET_IFNAME="$MN_IF_NAME" \
-  -e OMPI_MCA_btl_tcp_if_include="$MN_IF_NAME" \
-  -e GLOO_SOCKET_IFNAME="$MN_IF_NAME" \
-  -e TP_SOCKET_IFNAME="$MN_IF_NAME" \
-  -e RAY_memory_monitor_refresh_ms=0 \
-  -e MASTER_ADDR="$HEAD_IP" \
-  -e RAY_DISABLE_METRICS=1
+tmux new-session -d -s head
+tmux send-keys -t head "bash ~/run_cluster.sh $VLLM_IMAGE $VLLM_HOST_IP --head /home/mars/models \
+  -e VLLM_HOST_IP=$VLLM_HOST_IP \
+  -e NCCL_SOCKET_IFNAME=$MN_IF_NAME \
+  -e UCX_NET_DEVICES=$MN_IF_NAME \
+  -e GLOO_SOCKET_IFNAME=$MN_IF_NAME \
+  -e TP_SOCKET_IFNAME=$MN_IF_NAME \
+  -e MASTER_ADDR=$VLLM_HOST_IP \
+  -e RAY_memory_monitor_refresh_ms=0" Enter
+
+echo "Ray head started in tmux session 'head'. Attach with: tmux attach -t head"
