@@ -5,25 +5,35 @@
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-DRIVE_LABEL="mars-expac"
-NFS_DEVICE="${NFS_DEVICE:-/dev/sda1}"   # fallback if label not set
 NFS_MOUNT="${NFS_MOUNT:-/mnt/expac}"
 NFS_SUBNET="10.10.0.0/24"
 NFS_OPTS="rw,sync,no_subtree_check,no_root_squash"
 # ──────────────────────────────────────────────────────────────────────────────
 
+if [[ $# -lt 1 ]]; then
+    echo "Usage: sudo bash setup-nfs-server.sh <device>"
+    echo "  e.g. sudo bash setup-nfs-server.sh sda1"
+    echo "       sudo bash setup-nfs-server.sh sda"
+    echo ""
+    echo "Available disks:"
+    lsblk -o NAME,SIZE,LABEL,TYPE,MOUNTPOINT | grep -v loop
+    exit 1
+fi
+
+# Accept bare name (sda1) or full path (/dev/sda1)
+ARG="$1"
+NFS_DEVICE="/dev/${ARG#/dev/}"
+
+if [[ ! -b "$NFS_DEVICE" ]]; then
+    echo "ERROR: $NFS_DEVICE is not a block device."
+    lsblk -o NAME,SIZE,LABEL,TYPE,MOUNTPOINT | grep -v loop
+    exit 1
+fi
+echo "==> Using device: $NFS_DEVICE"
+
 echo "==> Installing NFS server..."
 apt-get update -q
 apt-get install -y -q nfs-kernel-server
-
-echo "==> Looking up device..."
-LABEL_DEVICE=$(blkid -L "$DRIVE_LABEL" 2>/dev/null || true)
-if [[ -n "$LABEL_DEVICE" ]]; then
-    NFS_DEVICE="$LABEL_DEVICE"
-    echo "    Found by label '$DRIVE_LABEL': $NFS_DEVICE"
-else
-    echo "    Label '$DRIVE_LABEL' not found, using $NFS_DEVICE"
-fi
 
 echo "==> Creating mount point $NFS_MOUNT..."
 mkdir -p "$NFS_MOUNT"
