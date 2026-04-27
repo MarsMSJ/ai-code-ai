@@ -26,6 +26,6 @@ ray start \
     --object-manager-port=8076 \
     --node-manager-port=8077 \
     --ray-client-server-port=10001 \
-    --object-store-memory=115000000000
+    --object-store-memory=20000000000
 
 ray status
