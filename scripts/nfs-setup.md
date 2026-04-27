@@ -1,15 +1,15 @@
 # NFS Setup — mars-expac 4TB Drive
 
-Shares the 4TB drive from the head node (`spark-50e0`) to all worker nodes over the **100GbE network** (`10.10.0.x`).
+Shares the 4TB drive from the head node (`spark-50e0`) to all worker nodes over the **100GbE network** (`10.100.0.x`).
 
 ## Topology
 
 | Role        | WAN IP          | 100GbE IP    |
 |-------------|-----------------|--------------|
-| Head        | 192.168.1.120   | 10.10.0.10   |
-| Worker 1    | 192.168.1.121   | 10.10.0.11   |
-| Worker 2    | 192.168.1.122   | 10.10.0.12   |
-| Worker 3    | 192.168.1.123   | 10.10.0.13   |
+| Head        | 192.168.1.120   | 10.100.0.10   |
+| Worker 1    | 192.168.1.121   | 10.100.0.11   |
+| Worker 2    | 192.168.1.122   | 10.100.0.12   |
+| Worker 3    | 192.168.1.123   | 10.100.0.13   |
 
 Mount point: `/mnt/expac` on all nodes.
 
@@ -48,7 +48,7 @@ showmount -e localhost
 
 Expected output:
 ```
-/mnt/expac  10.10.0.0/24
+/mnt/expac  10.100.0.0/24
 ```
 
 ---
@@ -86,7 +86,7 @@ done
 systemctl status nfs-kernel-server
 ```
 
-**Slow transfer speeds** — confirm you're using 100GbE IPs (`10.10.0.x`), not WAN IPs.
+**Slow transfer speeds** — confirm you're using 100GbE IPs (`10.100.0.x`), not WAN IPs.
 
 **"Stale file handle" after reboot** — re-export on head and remount on worker:
 ```bash

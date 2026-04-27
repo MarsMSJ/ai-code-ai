@@ -194,4 +194,4 @@ print(resp.choices[0].message.content)
 - **Model weights must be accessible from every node** — either via NFS (`/mnt/expac`) or pre-downloaded to each node's local disk. Mount NFS first (see `nfs-setup.md`).
 - **CAS/Xet download errors from HF** — `HF_HUB_ENABLE_XET=0` forces simple HTTP and avoids this.
 - **TP > GPUs-per-node warning from vLLM** — expected; 1 GPU per node with TP=8 spans nodes. Fine on 100GbE.
-- **Ray port 6379 must be open** between all nodes on the 10.10.0.x network.
+- **Ray port 6379 must be open** between all nodes on the 10.100.0.x network.

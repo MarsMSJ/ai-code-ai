@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Run on each WORKER node (192.168.1.121–127 / 10.10.0.2–8)
+# Run on each WORKER node (192.168.1.121–127 / 10.100.0.2–8)
 # Joins the Ray cluster using the vLLM venv (no Docker).
 
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_100G_IP="10.10.0.10"
+HEAD_100G_IP="10.100.0.10"
 IFACE_100G="enp1s0f1np1"
 VENV_PATH="${VENV_PATH:-/home/mars/.venv-tq}"   # or /mnt/expac/venv-tq if on NFS
 RAY_PORT=6379

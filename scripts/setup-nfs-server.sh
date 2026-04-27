@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Run on HEAD node (spark-50e0, 192.168.1.120 / 10.10.0.10)
+# Run on HEAD node (spark-50e0, 192.168.1.120 / 10.100.0.10)
 # Mounts the mars-expac 4.5TB drive and exports it via NFS to all worker nodes.
 
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 NFS_MOUNT="${NFS_MOUNT:-/mnt/expac}"
-NFS_SUBNET="10.10.0.0/24"
+NFS_SUBNET="10.100.0.0/24"
 NFS_OPTS="rw,sync,no_subtree_check,no_root_squash"
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -69,4 +69,4 @@ echo "Done. NFS export:"
 echo "  $NFS_MOUNT -> $NFS_SUBNET"
 echo ""
 echo "Workers should mount with:"
-echo "  mount -t nfs 10.10.0.10:$NFS_MOUNT $NFS_MOUNT"
+echo "  mount -t nfs 10.100.0.10:$NFS_MOUNT $NFS_MOUNT"

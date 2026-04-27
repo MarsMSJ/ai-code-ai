@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_100G_IP="10.10.0.10"
+HEAD_100G_IP="10.100.0.10"
 VENV_PATH="${VENV_PATH:-/home/mars/.venv-tq}"
 MODEL_ID="MiniMaxAI/MiniMax-M2"
 LOCAL_MODEL_PATH="${LOCAL_MODEL_PATH:-/mnt/expac/models/MiniMaxAI/MiniMax-M2}"

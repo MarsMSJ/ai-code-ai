@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Run on each WORKER node (192.168.1.121–127 / 10.10.0.2–8)
+# Run on each WORKER node (192.168.1.121–127 / 10.100.0.2–8)
 # Auto-detects this node's 100GbE IP and joins the Ray cluster.
 
 set -euo pipefail
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-HEAD_100G_IP="10.10.0.10"
+HEAD_100G_IP="10.100.0.10"
 IFACE_100G="enp1s0f1np1"
 VLLM_IMAGE="${VLLM_IMAGE:-vllm/vllm-openai:latest}"
 HF_CACHE="${HF_CACHE:-/home/mars/.cache/huggingface}"

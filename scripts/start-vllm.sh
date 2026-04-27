@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-HEAD_100G_IP="10.10.0.10"
+HEAD_100G_IP="10.100.0.10"
 MODEL_ID="MiniMaxAI/MiniMax-M2"
 LOCAL_MODEL_PATH="/vllm-workspace/models/MiniMaxAI/MiniMax-M2"
 CONTAINER_NAME="spark"
