@@ -24,4 +24,5 @@ ray start \
     --address="$HEAD_100G_IP:$RAY_PORT" \
     --node-ip-address="$WORKER_100G_IP" \
     --object-manager-port=8076 \
-    --node-manager-port=8077
+    --node-manager-port=8077 \
+    --object-store-memory=10000000000
