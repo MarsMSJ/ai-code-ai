@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run on HEAD node: spark-50e0 (10.100.0.10)
+# Run LAST on head node (10.100.0.10). Workers must already be running.
 
 VLLM_IMAGE="nvcr.io/nvidia/vllm:26.03.post1-py3"
 MN_IF_NAME="enp1s0f1np1"
@@ -17,4 +17,4 @@ tmux send-keys -t head "bash ~/run_cluster.sh $VLLM_IMAGE $VLLM_HOST_IP --head /
   -e MASTER_ADDR=$VLLM_HOST_IP \
   -e RAY_memory_monitor_refresh_ms=0" Enter
 
-echo "Ray head started in tmux session 'head'. Attach with: tmux attach -t head"
+echo "Head started. Attach: tmux attach -t head"
