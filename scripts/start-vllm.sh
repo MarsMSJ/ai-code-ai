@@ -5,7 +5,7 @@
 set -euo pipefail
 
 HEAD_100G_IP="10.100.0.10"
-MODEL_PATH="/home/mars/models/MiniMaxAI/MiniMax-M2"
+MODEL_PATH="/root/.cache/huggingface/MiniMaxAI/MiniMax-M2"
 VLLM_PORT=8000
 
 # Find the running node-* container
