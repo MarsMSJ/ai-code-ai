@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-HEAD_NFS_IP="10.10.0.1"
+HEAD_NFS_IP="192.168.1.120"
 NFS_EXPORT="/mnt/expac"
 LOCAL_MOUNT="/mnt/expac"
 WORKERS=(

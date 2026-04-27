@@ -7,7 +7,7 @@ set -euo pipefail
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 DRIVE_LABEL="mars-expac"
 NFS_MOUNT="${NFS_MOUNT:-/mnt/expac}"
-NFS_SUBNET="10.10.0.0/24"             # 100GbE network only
+NFS_SUBNET="192.168.1.0/24"
 NFS_OPTS="rw,sync,no_subtree_check,no_root_squash"
 # ──────────────────────────────────────────────────────────────────────────────
 
