@@ -8,7 +8,8 @@ MODELS_ROOT="${MODELS_ROOT:-/home/mars/models}"
 SOURCE="$HEAD_SSH:$MODELS_ROOT/$MODEL_RELATIVE_PATH/"
 DEST="$MODELS_ROOT/$MODEL_RELATIVE_PATH/"
 
-mkdir -p "$DEST"
+sudo mkdir -p "$DEST"
+sudo chown -R "$(id -u):$(id -g)" "$MODELS_ROOT"
 
 rsync -aH --info=progress2 --partial --inplace "$SOURCE" "$DEST"
 
