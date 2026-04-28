@@ -7,6 +7,8 @@ set -euo pipefail
 HEAD_100G_IP="10.100.0.10"
 MODEL_PATH="${MODEL_PATH:-/mnt/expac/models/MiniMaxAI/MiniMax-M2}"
 VLLM_PORT=8000
+MAX_MODEL_LEN="${MAX_MODEL_LEN:-131072}"
+GPU_MEMORY_UTILIZATION="${GPU_MEMORY_UTILIZATION:-0.85}"
 
 CUDA13_LIB="/home/mars/.venv-tq/lib/python3.12/site-packages/nvidia/cu13/lib"
 ln -sf "$CUDA13_LIB/libcudart.so.13" "$CUDA13_LIB/libcudart.so.12" 2>/dev/null || true
@@ -22,7 +24,8 @@ vllm serve "$MODEL_PATH" \
     --trust-remote-code \
     --distributed-executor-backend ray \
     --tensor-parallel-size 4 \
-    --gpu-memory-utilization 0.90 \
+    --max-model-len "$MAX_MODEL_LEN" \
+    --gpu-memory-utilization "$GPU_MEMORY_UTILIZATION" \
     --enable-auto-tool-choice --tool-call-parser minimax_m2 \
     --reasoning-parser minimax_m2_append_think \
     --host 0.0.0.0 --port "$VLLM_PORT"

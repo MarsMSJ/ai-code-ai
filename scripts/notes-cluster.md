@@ -52,9 +52,9 @@ bash run_cluster.sh $VLLM_IMAGE 10.100.0.10 --worker $NFS_STORE \
   vllm serve /root/.cache/huggingface/MiniMaxAI/MiniMax-M2.7 \
   --served-model-name MiniMax-M2.7 \
   --tensor-parallel-size 4 \
-  --max-model-len 180000 \
+  --max-model-len 131072 \
   --kv-cache-dtype fp8 \
-  --gpu-memory-utilization 0.9 \
+  --gpu-memory-utilization 0.85 \
   --enable-prefix-caching \
   --tool-call-parser minimax_m2 \
   --reasoning-parser minimax_m2 \
