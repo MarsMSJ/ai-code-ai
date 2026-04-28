@@ -20,3 +20,11 @@ bash scripts/cluster/start-vllm.sh
 # Run the portable agentic benchmark.
 bash scripts/benchmarks/agentic_bench_universal.sh MiniMax-M2.7 http://192.168.1.120:8000/v1
 ```
+
+Some upstream vLLM Docker images do not include the `ray` CLI required by
+`run_cluster.sh`. Build a local Ray-enabled variant first:
+
+```bash
+bash scripts/cluster/build-vllm-ray-image.sh
+sudo VLLM_IMAGE=vllm-ray:26.04-py3 bash scripts/cluster/start-ray-head.sh
+```

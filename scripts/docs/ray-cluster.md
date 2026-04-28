@@ -18,8 +18,17 @@ Two modes — pick one:
 
 ### 1. Head node (192.168.1.120)
 
+If your selected Docker image does not include the `ray` CLI, build a local
+variant first:
+
 ```bash
-sudo bash scripts/cluster/start-ray-head.sh
+BASE_IMAGE=nvcr.io/nvidia/vllm:26.04-py3 \
+OUTPUT_IMAGE=vllm-ray:26.04-py3 \
+  bash scripts/cluster/build-vllm-ray-image.sh
+```
+
+```bash
+sudo VLLM_IMAGE=vllm-ray:26.04-py3 bash scripts/cluster/start-ray-head.sh
 ```
 
 Confirm it's running:
@@ -194,4 +203,5 @@ print(resp.choices[0].message.content)
 - **Model weights must be accessible from every node** — either via NFS (`/mnt/expac`) or pre-downloaded to each node's local disk. Mount NFS first (see `scripts/docs/nfs-setup.md`).
 - **CAS/Xet download errors from HF** — `HF_HUB_ENABLE_XET=0` forces simple HTTP and avoids this.
 - **TP > GPUs-per-node warning from vLLM** — expected; 1 GPU per node with TP=8 spans nodes. Fine on 100GbE.
+- **`ray: command not found` in Docker** — the selected vLLM image does not include Ray. Build a local Ray-enabled image with `scripts/cluster/build-vllm-ray-image.sh` and use it via `VLLM_IMAGE`.
 - **Ray port 6379 must be open** between all nodes on the 10.100.0.x network.
