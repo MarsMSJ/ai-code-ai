@@ -23,8 +23,8 @@ Environment:
   OUT_FILE     Optional response JSON path. Defaults to /tmp/agentic_bench_last.json.
 
 Examples:
-  ./agentic_bench_universal.sh MiniMax-M2.7 http://localhost:8000/v1
-  API_KEY=sk-... ./agentic_bench_universal.sh gpt-oss http://my-server:8000/v1/chat/completions 1000
+  ./scripts/benchmarks/agentic_bench_universal.sh MiniMax-M2.7 http://localhost:8000/v1
+  API_KEY=sk-... ./scripts/benchmarks/agentic_bench_universal.sh gpt-oss http://my-server:8000/v1/chat/completions 1000
 EOF
 }
 

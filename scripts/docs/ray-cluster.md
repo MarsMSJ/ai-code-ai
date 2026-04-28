@@ -6,8 +6,8 @@ Two modes — pick one:
 
 | Mode | Scripts | When to use |
 |------|---------|-------------|
-| **Docker** | `start-ray-head.sh`, `start-ray-worker.sh`, `start-vllm.sh` | Clean container isolation |
-| **venv** | `start-ray-head-venv.sh`, `start-ray-worker-venv.sh`, `start-vllm-venv.sh` | vLLM installed via `uv pip install vllm` in `.venv-tq` |
+| **Docker** | `scripts/cluster/start-ray-head.sh`, `scripts/cluster/start-ray-worker.sh`, `scripts/cluster/start-vllm.sh` | Clean container isolation |
+| **venv** | `scripts/cluster/start-ray-head-venv.sh`, `scripts/cluster/start-ray-worker-venv.sh`, `scripts/cluster/start-vllm-venv.sh` | vLLM installed via `uv pip install vllm` in `.venv-tq` |
 
 - 100GbE interface: `enp1s0f1np1`
 - API endpoint: `http://192.168.1.120:8000/v1`
@@ -19,7 +19,7 @@ Two modes — pick one:
 ### 1. Head node (192.168.1.120)
 
 ```bash
-sudo bash scripts/start-ray-head.sh
+sudo bash scripts/cluster/start-ray-head.sh
 ```
 
 Confirm it's running:
@@ -34,7 +34,7 @@ docker exec -it spark ray status
 SSH into each and run:
 
 ```bash
-sudo bash scripts/start-ray-worker.sh
+sudo bash scripts/cluster/start-ray-worker.sh
 ```
 
 Or from the head in one shot:
@@ -43,7 +43,7 @@ Or from the head in one shot:
 for IP in 192.168.1.{121..123}; do
     echo "==> Starting worker on $IP"
     ssh mars@$IP "sudo VLLM_IMAGE=vllm/vllm-openai:latest bash -s" \
-        < scripts/start-ray-worker.sh &
+        < scripts/cluster/start-ray-worker.sh &
 done
 wait
 echo "All workers launched."
@@ -58,7 +58,7 @@ docker exec -it spark ray status
 ### 4. Start vLLM server (from head)
 
 ```bash
-bash scripts/start-vllm.sh
+bash scripts/cluster/start-vllm.sh
 ```
 
 ### Teardown
@@ -87,7 +87,7 @@ If you put the venv on NFS, set `VENV_PATH=/mnt/expac/venv-tq` in each command b
 ### 1. Head node (192.168.1.120)
 
 ```bash
-sudo bash scripts/start-ray-head-venv.sh
+sudo bash scripts/cluster/start-ray-head-venv.sh
 ```
 
 Confirm:
@@ -100,7 +100,7 @@ Confirm:
 ### 2. Each worker node (192.168.1.121–127)
 
 ```bash
-sudo bash scripts/start-ray-worker-venv.sh
+sudo bash scripts/cluster/start-ray-worker-venv.sh
 ```
 
 Or from the head in one shot:
@@ -108,7 +108,7 @@ Or from the head in one shot:
 ```bash
 for IP in 192.168.1.{121..123}; do
     echo "==> $IP"
-    ssh mars@$IP "sudo bash -s" < scripts/start-ray-worker-venv.sh &
+    ssh mars@$IP "sudo bash -s" < scripts/cluster/start-ray-worker-venv.sh &
 done
 wait
 echo "All workers joined."
@@ -128,7 +128,7 @@ You want:
 ### 4. Start vLLM server (from head)
 
 ```bash
-bash scripts/start-vllm-venv.sh
+bash scripts/cluster/start-vllm-venv.sh
 ```
 
 ### Teardown
@@ -191,7 +191,7 @@ print(resp.choices[0].message.content)
 
 ## Gotchas
 
-- **Model weights must be accessible from every node** — either via NFS (`/mnt/expac`) or pre-downloaded to each node's local disk. Mount NFS first (see `nfs-setup.md`).
+- **Model weights must be accessible from every node** — either via NFS (`/mnt/expac`) or pre-downloaded to each node's local disk. Mount NFS first (see `scripts/docs/nfs-setup.md`).
 - **CAS/Xet download errors from HF** — `HF_HUB_ENABLE_XET=0` forces simple HTTP and avoids this.
 - **TP > GPUs-per-node warning from vLLM** — expected; 1 GPU per node with TP=8 spans nodes. Fine on 100GbE.
 - **Ray port 6379 must be open** between all nodes on the 10.100.0.x network.

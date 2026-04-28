@@ -30,13 +30,13 @@ Common paths: `/dev/sdb`, `/dev/sdc`, `/dev/nvme1n1`
 ## Step 2 — Run NFS server setup on head (192.168.1.120)
 
 ```bash
-sudo NFS_DEVICE=/dev/sdb bash scripts/setup-nfs-server.sh
+sudo NFS_DEVICE=/dev/sdb bash scripts/storage/setup-nfs-server.sh
 ```
 
 Override the device if yours differs:
 
 ```bash
-sudo NFS_DEVICE=/dev/nvme1n1 bash scripts/setup-nfs-server.sh
+sudo NFS_DEVICE=/dev/nvme1n1 bash scripts/storage/setup-nfs-server.sh
 ```
 
 Verify the export is active:
@@ -58,7 +58,7 @@ Expected output:
 SSH into each worker and run:
 
 ```bash
-sudo bash scripts/mount-nfs-client.sh
+sudo bash scripts/storage/mount-nfs-client.sh
 ```
 
 Verify:
@@ -73,7 +73,7 @@ ls /mnt/expac
 ```bash
 for IP in 192.168.1.{121..123}; do
     echo "==> $IP"
-    ssh mars@$IP "sudo bash -s" < scripts/mount-nfs-client.sh
+    ssh mars@$IP "sudo bash -s" < scripts/storage/mount-nfs-client.sh
 done
 ```
 
