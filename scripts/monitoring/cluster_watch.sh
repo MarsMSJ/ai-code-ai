@@ -24,7 +24,7 @@ if ! command -v tmux >/dev/null 2>&1; then
 fi
 
 # Kill existing session if present
-tmux kill-session -t "$SESSION" 2>/dev/null
+tmux kill-session -t "$SESSION" 2>/dev/null || true
 
 # Create new session, first pane = node 0.
 tmux new-session -d -s "$SESSION" -x 220 -y 50 \
